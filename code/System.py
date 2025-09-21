@@ -274,6 +274,7 @@ class System:
         if _debug:
             print_debug("System", "Get [main]week type[/main].")
 
+
         if int(self.database.get_number_of_weeks_types()) == 1:
             return 0
 
