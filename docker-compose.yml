@@ -1,0 +1,20 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis_service
+    ports:
+      - "6379:6379"
+    tmpfs:
+      - /data
+    restart: unless-stopped
+  app:
+    build: .
+    container_name: python_app
+    depends_on:
+      - redis
+    volumes:
+      - ./code:/code
+      - ./data:/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

@@ -1,0 +1,5 @@
+aiogram
+tzdata
+redis
+numpy
+rich
