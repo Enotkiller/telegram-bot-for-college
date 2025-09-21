@@ -273,7 +273,10 @@ class System:
 
         if _debug:
             print_debug("System", "Get [main]week type[/main].")
-        
+
+        if int(self.database.get_number_of_weeks_types()) == 1:
+            return 0
+
         when_mounth, when_day, when_year = mounth if mounth else self.database.get_data_week_type(_debug = False)["month"], day if day else self.database.get_data_week_type(_debug = False)["day"], year if year else self.database.get_data_week_type(_debug = False)["year"]
         when_mounth, when_day, when_year = np.uint(when_mounth), np.uint(when_day), np.uint(when_year)
         mounth = int(datetime.datetime.now().strftime("%m")) if not _mounth else _mounth
