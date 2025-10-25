@@ -1,28 +1,87 @@
-# Всем новоприбывшим привет!
+# 📅 College Schedule Telegram Bot
 
-Комманды для запуска:
-  ```
-  docker-compose build --no-cache
-  docker-compose up -d
-  ```
+> Telegram-бот для автоматической рассылки расписания пар студентам колледжа.  
+> Использует Redis для кэширования данных и Docker для контейнеризации.
 
-____
+---
 
-Комманда для остановки:
+## 🚀 Демонстрация
+![Bot demo](./docs/demo.gif)
+
+---
+
+## 🧠 Возможности
+✅ Рассылка пар по времени  
+✅ Команды `/para` [`None`, `all`, `next`], `/cancel`, `/pingme`, `/pingwho`  
+✅ Загрузка данных из JSON в Redis  
+✅ Асинхронная логика через `asyncio`  
+✅ Полная поддержка Docker и Compose  
+
+---
+
+## 🗂️ Структура проекта
+```text
+project/
+│
+├── code/
+│   ├── Bot.py
+│   ├── System.py
+│   ├── DataBase.py
+│   ├── Debug.py
+│
+├── data/
+│   ├── Config.json
+│   ├── Schedule.json
+│   ├── lessons.json
+│   ├── Url.json
+│   ├── Ping.json
+│
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+└── README.md
 ```
-docker-compose down
+
+---
+
+## ⚙️ Установка и запуск
+
+### 1️⃣ Локальный запуск
+```bash
+git clone https://github.com/твоя_ссылка
+cd project
+pip install -r requirements.txt
+python code/Bot.py
 ```
 
-____
+### 2️⃣ Docker
+```bash
+docker compose up --build
+```
 
-В [`code/`](/code/) - весь код.
+---
 
-В [`data/`](/data/) - конфиги бота, пар, расписание. Всего и вся короче.
+## 🧩 Технологии
+- Python 3.13  
+- Aiogram 3  
+- Redis  
+- Docker / Docker Compose  
+- Rich (логирование)
 
-____
+---
 
-Тг - **@en0tpalaskyn**
+## 📚 Документация
+- [Описание кода](/docs/code_description.md)
+- [Описание данных](/docs/data_description.md)
 
-Дс - **enotpalaskyn**
+---
 
-для того если хотите узнать что это и для чего это.
+## 👤 Автор
+**Enotkiller**  
+> Telegram: [@en0tpalaskyn](https://t.me/en0tpalaskyn)  
+> GitHub: [github.com/Enotkiller](https://github.com/Enotkiller)
+
+---
+
+## 🏷️ Лицензия
+[MIT License © 2025 Enotkiller](/LICENSE)
