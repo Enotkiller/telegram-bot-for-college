@@ -23,8 +23,8 @@
 📄 *Пример:*
 ```json
 {
-  "chats_id": ["-1002228889442"],
-  "chat_log_id": "-1002419689146",
+  "chats_id": ["-1111111111111"],
+  "chat_log_id": "-1111111111111",
   "number_of_weeks_types": 2,
   "data_week_type": {"type": 1, "year": 2025, "month": 9, "day": 1},
   "token": "7652...Wdhzg",
@@ -83,8 +83,8 @@
 📄 *Пример:*
 ```json
 {
-  "94a4e0a9-dccf-4d48-a54d-b092e5c74eda": "https://meet.google.com/znu-moir-atb",
-  "541fa0f9-ecf8-4f03-8870-c16190ed872a": "https://meet.google.com/kwt-xdbj-kdq"
+  "94a4e0a9-dccf-4d48-a54d-b092e5c74eda": "https://meet.google.com/bfg-anjy-axz",
+  "541fa0f9-ecf8-4f03-8870-c16190ed872a": "https://meet.google.com/fst-mfnb-gfd"
 }
 ```
 
@@ -104,8 +104,8 @@
 📄 *Пример:*
 ```json
 {
-  "en0tpalaskyn": "1528266799",
-  "Argrosa": "5376094724"
+  "en0tpalaskyn": "1111111111",
+  "Dima": "2222222222"
 }
 ```
 
