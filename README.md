@@ -48,10 +48,8 @@ project/
 
 ### 1️⃣ Локальный запуск
 ```bash
-git clone https://github.com/твоя_ссылка
-cd project
 pip install -r requirements.txt
-python code/Bot.py
+python main.py
 ```
 
 ### 2️⃣ Docker
