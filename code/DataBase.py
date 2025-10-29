@@ -575,7 +575,7 @@ class DataBase:
                 return False
 
         if ping.get(username):
-            ping.remove(username)
+            ping.pop(username)
             open(
                 os.path.join(path_project, "data/Ping.json"), "w", encoding="utf-8"
             ).write(json.dumps(ping))
