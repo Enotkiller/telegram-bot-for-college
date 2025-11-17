@@ -153,7 +153,7 @@ class BotСollege:
             else:
                 await message.reply(text="Такой пары нет.")
             return
-
+        
     async def cancel_lesson(self, message: Message, command: CommandObject):
         """
         Команда /cancel аргументы\n
@@ -169,22 +169,18 @@ class BotСollege:
             "Bot",
             f"Send [main]cancel[/main], parameters: [main]{command.args if command.args is not None else None}[/main].",
         )
-        args = command.args if command.args is not None else None
+
+        args = str(command.args).replace(" ", "").replace(",", "") if command.args is not None else None
         mass = []
-        if args is None:
-            mass = str(str(args).split()).strip(", ")
-            for i in mass:
-                if i.isdigit():
-                    if 0 < int(i) <= self.database.get_max_lesson_in_days():
+        if args:
+            for i in args:
+                if str(i).isdigit():
+                    if 0 < int(i) <= self.database.get_max_lesson_in_days(_debug = False):
                         mass.append(int(i))
 
-        if args is None:
-            self.system.set_cancellation_on_lesson()
+        self.system.set_cancellation_on_lesson(mass = mass or None)
 
-        else:
-            self.system.set_cancellation_on_lesson(mass=mass)
-
-        text = f"Пары отменены: <b>{', '.join([f"номер: {i[0]}, день: {self.days[i[1] - 1]}" for i in self.system.cancellation])}</b>."
+        text = f"Пары отменены: <b>{', '.join([f"номер: {i[0]}, день: {self.days[i[1] - 1]}" for i in self.system.cancellation])}</b>." if self.system.cancellation else "Нет отмен."
         await message.answer(text, parse_mode=ParseMode.HTML)
 
     async def pingme(self, message: Message):

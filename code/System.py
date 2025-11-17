@@ -505,7 +505,6 @@ class System:
 
     def set_cancellation_on_lesson(self, mass: Any = None, _debug: bool = True) -> None:
         """
-
         Установка отмены на пару.
 
         Args:
@@ -513,14 +512,22 @@ class System:
             _debug (bool): Если True, то выводится в консоль сообщение.
         """
 
-        if mass is None:
-            self.cancellation.append(
-                [
-                    self.get_lesson_number_now_without_type(_debug = False),
-                    self.get_day_isoweekday_now(_debug = False),
-                ]
-            )
+        if not mass:
+            pair = [
+                self.get_lesson_number_now_without_type(_debug = False),
+                self.get_day_isoweekday_now(_debug = False),
+            ]
+            if pair in self.cancellation:
+                self.cancellation.remove(pair)
 
+            else:
+                self.cancellation.append(pair)
+
+            if _debug:
+                print_debug(
+                    "System",
+                    "Set [main]cancellation[/main] on [main]lesson[/main].",
+                )
         else:
             if type(mass) is int:
                 mass = [mass]
@@ -532,17 +539,45 @@ class System:
                 mass = [int(mass)]
 
             if type(mass) is list or type(mass) is tuple:
-                for i in mass:
-                    self.cancellation.append(
-                        [i, self.get_day_isoweekday_now(_debug = False)]
-                    )
+                day = self.get_day_isoweekday_now(_debug = False)
+                number_lesson_now = self.get_lesson_number_now_without_type(_debug = False)
+                for number_lesson in mass:
+                    delete = []
+                    continue_status = False
+                    for i in range(len(self.cancellation)):
+                        cancel = self.cancellation[i]
+                        if cancel[0] == number_lesson and cancel[1] == day:
+                            delete.append(cancel)
+                            continue_status = True
                     
-                if _debug:
-                    print_debug(
-                        "System",
-                        "Set [main]cancellation[/main] on [main]lesson[/main].",
-                    )
+                        if cancel[0] > number_lesson_now and cancel[1] == day:
+                            delete.append(cancel)
 
+                    for cancel in delete:
+                        if cancel in self.cancellation:
+                            self.cancellation.remove(cancel)
+
+                    if continue_status:
+                        continue
+
+                    if number_lesson < number_lesson_now:
+                        continue
+                    
+                    self.cancellation.append(
+                        [number_lesson, self.get_day_isoweekday_now(_debug = False)]
+                    )
+                        
+                    if _debug:
+                        print_debug(
+                            "System",
+                            f"Set [main]cancellation[/main] on [main]{mass}[/main].",
+                        )
+        if _debug:
+            print_debug(
+                "System",
+                f"Set [main]cancellation[/main] on [main]{self.cancellation}[/main].",
+            )
+            
     def get_cancellation(self, _debug: bool = True) -> bool:
         """
 
