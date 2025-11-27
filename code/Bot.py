@@ -205,7 +205,7 @@ class BotСollege:
 
         else:
             await message.reply(
-                text="Вы ужебыли <b>удалины</b> в список пингов.",
+                text="Вы были <b>удалены</b> в списке пингов.",
                 parse_mode=ParseMode.HTML,
             )
 
