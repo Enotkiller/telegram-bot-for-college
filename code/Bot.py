@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.enums import ParseMode
-from aiogram.filters import Command, CommandObject
+from aiogram.filters import Command, CommandStart, CommandObject
 from zoneinfo import ZoneInfo
 import asyncio
 
@@ -32,10 +32,23 @@ class BotСollege:
         self.bot = Bot(token=TOKEN)
         self.dp = Dispatcher(bot=self.bot)
 
+        self.dp.message.register(self.start_command, CommandStart())
         self.dp.message.register(self.send_lesson, Command("para"))
         self.dp.message.register(self.cancel_lesson, Command("cancel"))
         self.dp.message.register(self.pingme, Command("pingme"))
         self.dp.message.register(self.pingwho, Command("pingwho"))
+
+    async def start_command(self, message: Message):
+        """
+
+        Команда - /start\n
+        Выводит приветствие.
+
+        Args:
+            message (Message): Сообщение.
+        """
+
+        await message.reply(text="Привет, я <b>бот</b> для уведомлений о парах.\n<b>/para [None | all | next | number]</b> - выводит текущую пару.\n<b>/cancel [None | number | list[number]]</b> - отменяет пары.\n<b>/pingme</b> - добавляет в список пингов.\n<b>/pingwho</b> - выводит список пингов.\n", parse_mode=ParseMode.HTML)
 
     async def send_lesson(self, message: Message, command: CommandObject):
         """
