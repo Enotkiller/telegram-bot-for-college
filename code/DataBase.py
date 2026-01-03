@@ -1,7 +1,8 @@
 import json
 import os
-import redis
+
 import numpy as np
+import redis
 from Debug import print_debug
 
 
@@ -19,9 +20,7 @@ class DataBase:
 
         self.load_redis_config()
         try:
-            self.redis = redis.Redis(
-                host=self.redis_host, port=self.redis_port, db=0, decode_responses=True
-            )
+            self.redis = redis.Redis(host=self.redis_host, port=self.redis_port, db=0, decode_responses=True)
 
         except Exception as e:
             if _debug:
@@ -54,10 +53,7 @@ class DataBase:
             print_debug("DataBase", "Load [main]redis[/main] config...")
         main_config = json.loads(
             open(
-                os.path.join(
-                    os.path.split(os.path.dirname(os.path.abspath(__file__)))[0],
-                    "data/Config.json",
-                ),
+                os.path.join(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0], "data/Config.json"),
                 "r",
                 encoding="utf-8",
             ).read()
@@ -80,30 +76,12 @@ class DataBase:
             print_debug("DataBase", "Path project: [main]" + path_project + ".[/main]")
 
         self.main_config = json.loads(
-            open(
-                os.path.join(path_project, "data/Config.json"), "r", encoding="utf-8"
-            ).read()
+            open(os.path.join(path_project, "data/Config.json"), "r", encoding="utf-8").read()
         )
-        self.schedule = json.loads(
-            open(
-                os.path.join(path_project, "data/Schedule.json"), "r", encoding="utf-8"
-            ).read()
-        )
-        self.lessons = json.loads(
-            open(
-                os.path.join(path_project, "data/lessons.json"), "r", encoding="utf-8"
-            ).read()
-        )
-        self.ping = json.loads(
-            open(
-                os.path.join(path_project, "data/Ping.json"), "r", encoding="utf-8"
-            ).read()
-        )
-        self.url = json.loads(
-            open(
-                os.path.join(path_project, "data/Url.json"), "r", encoding="utf-8"
-            ).read()
-        )
+        self.schedule = json.loads(open(os.path.join(path_project, "data/Schedule.json"), "r", encoding="utf-8").read())
+        self.lessons = json.loads(open(os.path.join(path_project, "data/lessons.json"), "r", encoding="utf-8").read())
+        self.ping = json.loads(open(os.path.join(path_project, "data/Ping.json"), "r", encoding="utf-8").read())
+        self.url = json.loads(open(os.path.join(path_project, "data/Url.json"), "r", encoding="utf-8").read())
 
         del path_project
         if _debug:
@@ -126,14 +104,13 @@ class DataBase:
         for day in self.schedule:
             if day == "times":
                 continue
-
             for number_lesson, lessons in self.schedule[day].items():
                 lessons_data = []
                 for i in lessons:
-                    if type(i) is int:
+                    if isinstance(i, list):
                         lessons_data.append(lessons[i])
 
-                    elif type(i) is str:
+                    elif isinstance(i, str):
                         lessons_data.append(i)
 
                     elif i is None:
@@ -151,26 +128,17 @@ class DataBase:
             self.redis.hset("times_lessons", number_lessons, json.dumps(value))
 
         if _debug:
-            print_debug(
-                "DataBase",
-                "Converter [main]schedule[/main] in redis [main]complete.[/main]",
-            )
+            print_debug("DataBase", "Converter [main]schedule[/main] in redis [main]complete.[/main]")
 
         # ---------LESSONS---------
         for id, lessons in self.lessons.items():
             self.redis.set(f"lessons_{id}", lessons)
             self.redis.set(f"lessons_{lessons}", id)
             if _debug:
-                print_debug(
-                    "DataBase",
-                    f"redis add lesson: [main]{lessons}[/main], id: [main]{id}[/main].",
-                )
+                print_debug("DataBase", f"redis add lesson: [main]{lessons}[/main], id: [main]{id}[/main].")
 
         if _debug:
-            print_debug(
-                "DataBase",
-                "Converter [main]lessons[/main] in redis [main]complete.[/main]",
-            )
+            print_debug("DataBase", "Converter [main]lessons[/main] in redis [main]complete.[/main]")
 
         # ---------PING---------
         pings_username_data = [i for i in self.ping]
@@ -183,33 +151,22 @@ class DataBase:
             )
 
         if _debug:
-            print_debug(
-                "DataBase",
-                "Converter [main]pings_username[/main] in redis [main]complete.[/main]",
-            )
+            print_debug("DataBase", "Converter [main]pings_username[/main] in redis [main]complete.[/main]")
 
         for username, user_id in self.ping.items():
             self.redis.set(f"pings_{username}", user_id)
 
         if _debug:
-            print_debug(
-                "DataBase",
-                "Converter [main]pings[/main] in redis [main]complete.[/main]",
-            )
+            print_debug("DataBase", "Converter [main]pings[/main] in redis [main]complete.[/main]")
 
         # ---------URL---------
         for id, url in self.url.items():
             self.redis.set(f"url_{id}", url)
             if _debug:
-                print_debug(
-                    "DataBase",
-                    f"redis add url: [main]{url}[/main], id: [main]{id}[/main].",
-                )
+                print_debug("DataBase", f"redis add url: [main]{url}[/main], id: [main]{id}[/main].")
 
         if _debug:
-            print_debug(
-                "DataBase", "Converter [main]url[/main] in redis [main]complete.[/main]"
-            )
+            print_debug("DataBase", "Converter [main]url[/main] in redis [main]complete.[/main]")
 
         # ---------CONFIG---------
         self.redis.set("config_token", self.main_config["token"])
@@ -219,24 +176,17 @@ class DataBase:
             "config_number_of_weeks_types",
             np.uint8(self.main_config["number_of_weeks_types"]).tobytes(),
         )
-        self.redis.hset(
-            "config_data_week_type", mapping=self.main_config["data_week_type"]
-        )
+        self.redis.hset("config_data_week_type", mapping=self.main_config["data_week_type"])
         self.redis.set("time_zone", self.main_config["time_zone"])
 
         max_days = int([i for i in self.schedule["times"]][-1])
         self.redis.set("config_max_lesson_in_days", np.uint8(max_days).tobytes())
         if _debug:
-            print_debug(
-                "DataBase",
-                "Converter [main]config[/main] in redis [main]complete.[/main]",
-            )
+            print_debug("DataBase", "Converter [main]config[/main] in redis [main]complete.[/main]")
 
         del self.main_config, self.schedule, self.lessons, self.ping, self.url
         if _debug:
-            print_debug(
-                "DataBase", "Converter [main]all[/main] in redis [main]complete.[/main]"
-            )
+            print_debug("DataBase", "Converter [main]all[/main] in redis [main]complete.[/main]")
 
         self.redis.set("redis_write_all_configs", "True")
 
@@ -267,15 +217,10 @@ class DataBase:
         Returns:
             np.uint8: Максимальное количество уроков в день.
         """
-        max_days = np.frombuffer(
-            self.redis.get("config_max_lesson_in_days").encode("utf-8"), dtype=np.uint8
-        )[0]
+        max_days = np.frombuffer(self.redis.get("config_max_lesson_in_days").encode("utf-8"), dtype=np.uint8)[0]
 
         if _debug:
-            print_debug(
-                "DataBase",
-                f"Get [main]max lesson in days[/main]: [main]{max_days}[/main].",
-            )
+            print_debug("DataBase", f"Get [main]max lesson in days[/main]: [main]{max_days}[/main].")
 
         return max_days
 
@@ -297,10 +242,7 @@ class DataBase:
         lesson = self.redis.get(f"lessons_{id}")
 
         if _debug:
-            print_debug(
-                "DataBase",
-                f"Get lesson for id: [main]{id}[/main], lesson: [main]{lesson}[/main].",
-            )
+            print_debug("DataBase", f"Get lesson for id: [main]{id}[/main], lesson: [main]{lesson}[/main].")
 
         return lesson
 
@@ -322,16 +264,11 @@ class DataBase:
         url = self.redis.get(f"url_{id}")
 
         if _debug:
-            print_debug(
-                "DataBase",
-                f"Get url for id: [main]{id}[/main], url: [main]{url}[/main].",
-            )
+            print_debug("DataBase", f"Get url for id: [main]{id}[/main], url: [main]{url}[/main].")
 
         return url
 
-    def get_id_lesson_for_date(
-        self, day: int = None, number_lesson: int = None, _debug: bool = True
-    ) -> list[str]:
+    def get_id_lesson_for_date(self, day: int = None, number_lesson: int = None, _debug: bool = True) -> list[str]:
         """
 
         Получение id урока по дате.
@@ -358,11 +295,7 @@ class DataBase:
         return lessons
 
     def get_lesson_for_date(
-        self,
-        day: int = None,
-        number_lesson: int = None,
-        _id_lessons=None,
-        _debug: bool = True,
+        self, day: int = None, number_lesson: int = None, _id_lessons=None, _debug: bool = True
     ) -> list[str]:
         """
 
@@ -377,17 +310,11 @@ class DataBase:
             list[str]: Список id уроков.
             list[str]: Список уроков.
         """
-        if (
-            day is None
-            or number_lesson is None
-            or self.get_max_lesson_in_days(_debug=False) < number_lesson
-        ):
+        if day is None or number_lesson is None or self.get_max_lesson_in_days(_debug=False) < number_lesson:
             return None, None
 
         id_lessons = (
-            self.get_id_lesson_for_date(day, number_lesson, _debug=False)
-            if _id_lessons is None
-            else _id_lessons
+            self.get_id_lesson_for_date(day, number_lesson, _debug=False) if _id_lessons is None else _id_lessons
         )
         lessons = [self.get_lesson_for_id(id, _debug=False) for id in id_lessons]
 
@@ -405,9 +332,7 @@ class DataBase:
 
         return self.redis.lrange("pings_username", 0, -1)
 
-    def get_user_id_for_username(
-        self, username: str = None, _debug: bool = True
-    ) -> str:
+    def get_user_id_for_username(self, username: str = None, _debug: bool = True) -> str:
         """
 
         Получение id пользователя по username.
@@ -421,11 +346,8 @@ class DataBase:
 
         if username is None:
             return
-
         if _debug:
-            print_debug(
-                "DataBase", f"Get user id for username: [main]{username}[/main]"
-            )
+            print_debug("DataBase", f"Get user id for username: [main]{username}[/main]")
 
         return self.redis.get(f"pings_{username}")
 
@@ -443,10 +365,7 @@ class DataBase:
         chats = self.redis.get("config_chats_id").split("|")
 
         if _debug:
-            print_debug(
-                "DataBase",
-                "Get [main]chats id[/main]: [main]" + ", ".join(chats) + "[/main].",
-            )
+            print_debug("DataBase", "Get [main]chats id[/main]: [main]" + ", ".join(chats) + "[/main].")
 
         return chats
 
@@ -464,10 +383,7 @@ class DataBase:
         chat_log = str(self.redis.get("config_chat_log_id"))
 
         if _debug:
-            print_debug(
-                "DataBase",
-                "Get [main]chat log id[/main]: [main]" + chat_log + "[/main].",
-            )
+            print_debug("DataBase", "Get [main]chat log id[/main]: [main]" + chat_log + "[/main].")
 
         return chat_log
 
@@ -499,8 +415,7 @@ class DataBase:
         """
 
         number_of_weeks_types = np.frombuffer(
-            self.redis.get("config_number_of_weeks_types").encode("utf-8"),
-            dtype=np.uint8,
+            self.redis.get("config_number_of_weeks_types").encode("utf-8"), dtype=np.uint8
         )[0]
 
         if _debug:
@@ -536,9 +451,7 @@ class DataBase:
 
         return result
 
-    def add_user_in_pings(
-        self, username: str = None, user_id: str = None, _debug: bool = True
-    ) -> bool:
+    def add_user_in_pings(self, username: str = None, user_id: str = None, _debug: bool = True) -> bool:
         """
 
         Добавление/удаление пользователя в спосок пингов.
@@ -553,38 +466,26 @@ class DataBase:
 
         if username is None or user_id is None:
             return
-
         if _debug:
             print_debug(
                 "DataBase",
                 f"Add user in pings: username: [main]{username}[/main], user id: [main]{user_id}[/main]",
             )
         path_project = os.path.split(os.path.dirname(os.path.abspath(__file__)))[0]
-        ping = json.loads(
-            open(
-                os.path.join(path_project, "data/Ping.json"), "r", encoding="utf-8"
-            ).read()
-        )
+        ping = json.loads(open(os.path.join(path_project, "data/Ping.json"), "r", encoding="utf-8").read())
 
         for username_value, id_value in ping.items():
             if id_value == user_id:
                 ping.remove(username_value)
-                open(
-                    os.path.join(path_project, "data/Ping.json"), "w", encoding="utf-8"
-                ).write(json.dumps(ping))
                 return False
 
         if ping.get(username):
-            ping.pop(username)
-            open(
-                os.path.join(path_project, "data/Ping.json"), "w", encoding="utf-8"
-            ).write(json.dumps(ping))
+            ping.remove(username)
+            open(os.path.join(path_project, "data/Ping.json"), "w", encoding="utf-8").write(json.dumps(ping))
             return False
 
-        ping[username] = str(user_id)
-        open(os.path.join(path_project, "data/Ping.json"), "w", encoding="utf-8").write(
-            json.dumps(ping)
-        )
+        ping[username] = user_id
+        open(os.path.join(path_project, "data/Ping.json"), "w", encoding="utf-8").write(json.dumps(ping))
 
         self.redis.rpush("pings_username", username)
         self.redis.set(f"pings_{username}", user_id)
@@ -611,9 +512,7 @@ class DataBase:
 
         return result
 
-    def get_start_recession(
-        self, number_lesson: int = None, _debug: bool = True
-    ) -> str:
+    def get_start_recession(self, number_lesson: int = None, _debug: bool = True) -> str:
         """
 
         Получение начала перемены.
@@ -628,16 +527,12 @@ class DataBase:
         if number_lesson is None:
             return
 
-        start_recession = json.loads(
-            self.redis.hget("times_lessons", str(number_lesson))
-        )["start_recession"]
+        start_recession = json.loads(self.redis.hget("times_lessons", str(number_lesson)))["start_recession"]
 
         if _debug:
             print_debug(
                 "DataBase",
-                "Get [main]start recession[/main]: [main]"
-                + start_recession
-                + "[/main].",
+                "Get [main]start recession[/main]: [main]" + start_recession + "[/main].",
             )
 
         return start_recession
@@ -657,15 +552,10 @@ class DataBase:
         if number_lesson is None:
             return
 
-        start_lesson = json.loads(self.redis.hget("times_lessons", str(number_lesson)))[
-            "start_lesson"
-        ]
+        start_lesson = json.loads(self.redis.hget("times_lessons", str(number_lesson)))["start_lesson"]
 
         if _debug:
-            print_debug(
-                "DataBase",
-                "Get [main]start lesson[/main]: [main]" + start_lesson + "[/main].",
-            )
+            print_debug("DataBase", "Get [main]start lesson[/main]: [main]" + start_lesson + "[/main].")
 
         return start_lesson
 
@@ -684,15 +574,10 @@ class DataBase:
         if number_lesson is None:
             return
 
-        end_lesson = json.loads(self.redis.hget("times_lessons", str(number_lesson)))[
-            "end_lesson"
-        ]
+        end_lesson = json.loads(self.redis.hget("times_lessons", str(number_lesson)))["end_lesson"]
 
         if _debug:
-            print_debug(
-                "DataBase",
-                "Get [main]end lesson[/main]: [main]" + end_lesson + "[/main].",
-            )
+            print_debug("DataBase", "Get [main]end lesson[/main]: [main]" + end_lesson + "[/main].")
 
         return end_lesson
 
@@ -711,9 +596,7 @@ class DataBase:
         if number_lesson is None:
             return
 
-        send_spam = json.loads(self.redis.hget("times_lessons", str(number_lesson)))[
-            "send_spam"
-        ]
+        send_spam = json.loads(self.redis.hget("times_lessons", str(number_lesson)))["send_spam"]
 
         if _debug:
             print_debug(

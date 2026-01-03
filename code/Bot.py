@@ -1,18 +1,18 @@
-from datetime import timedelta, datetime
-from aiogram import Bot, Dispatcher
-from aiogram.types import Message
-from aiogram.enums import ParseMode
-from aiogram.filters import Command, CommandStart, CommandObject
-from zoneinfo import ZoneInfo
 import asyncio
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
+from aiogram import Bot, Dispatcher
+from aiogram.enums import ParseMode
+from aiogram.filters import Command, CommandObject, CommandStart
+from aiogram.types import Message
+from DataBase import DataBase
 from Debug import print_debug
 from System import System
-from DataBase import DataBase
 
 
 class BotСollege:
-    def __init__(self, _token = None, _debug = True):
+    def __init__(self, _token=None, _debug=True):
         """
 
         Инициализация бота, базы данных и системы.
@@ -26,7 +26,6 @@ class BotСollege:
             print_debug("Bot", "[main]Initialized.[/main]")
         self.database: DataBase = DataBase(_debug=_debug)
         self.system: System = System(_database=self.database, _debug=_debug)
-
         self.days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница"]
         TOKEN = _token if _token else self.database.get_token()
         self.bot = Bot(token=TOKEN)
@@ -48,7 +47,10 @@ class BotСollege:
             message (Message): Сообщение.
         """
 
-        await message.reply(text="Привет, я <b>бот</b> для уведомлений о парах.\n<b>/para [None | all | next | number]</b> - выводит текущую пару.\n<b>/cancel [None | number | list[number]]</b> - отменяет пары.\n<b>/pingme</b> - добавляет в список пингов.\n<b>/pingwho</b> - выводит список пингов.\n", parse_mode=ParseMode.HTML)
+        await message.reply(
+            text="Привет, я <b>бот</b> для уведомлений о парах.\n<b>/para [None | all | next | number]</b> - выводит текущую пару.\n<b>/cancel [None | number | list[number]]</b> - отменяет пары.\n<b>/pingme</b> - добавляет в список пингов.\n<b>/pingwho</b> - выводит список пингов.\n",
+            parse_mode=ParseMode.HTML,
+        )
 
     async def send_lesson(self, message: Message, command: CommandObject):
         """
@@ -68,13 +70,13 @@ class BotСollege:
 
         print_debug(
             "Bot",
-            f"Send [main]lesson[/main], parameters: [main]{args if args is None else ", ".join(args)}[/main].",
+            f"Send [main]lesson[/main], parameters: [main]{args if args is None else ', '.join(args)}[/main].",
         )
 
         if args is None:
             _, lesson = self.system.get_lesson_now()
-            text_lesson = f"{str("Текущая") if not self.system.recess_now() else str("Будет")} пара: <b>{lesson}</b>."
-            text_status = f"Статус: <b>{str("Отпустили") if self.system.get_cancellation() else 'Перемена' if self.system.recess_now() else str("Идёт")}</b>."
+            text_lesson = f"{str('Текущая') if not self.system.recess_now() else str('Будет')} пара: <b>{lesson}</b>."
+            text_status = f"Статус: <b>{str('Отпустили') if self.system.get_cancellation() else 'Перемена' if self.system.recess_now() else str('Идёт')}</b>."
             text_url = f"Ссылка: {self.system.get_url_now()}"
             if lesson is None:
                 await message.answer(text="На сегодня пар нет.")
@@ -112,19 +114,10 @@ class BotСollege:
                 return
 
         elif args[0].lower() == "next":
-            if (
-                self.system.get_day_isoweekday_now() < 5
-                or self.system.get_day_isoweekday_now() == 7
-            ):
+            if self.system.get_day_isoweekday_now() < 5 or self.system.get_day_isoweekday_now() == 7:
                 text = ""
-                day = (
-                    self.system.get_day_isoweekday_now() + 1
-                    if self.system.get_day_isoweekday_now() < 7
-                    else 1
-                )
-                date = datetime.now(
-                    ZoneInfo(self.database.get_time_zone())
-                ) + timedelta(days=1)
+                day = self.system.get_day_isoweekday_now() + 1 if self.system.get_day_isoweekday_now() < 7 else 1
+                date = datetime.now(ZoneInfo(self.database.get_time_zone())) + timedelta(days=1)
 
                 for i in range(1, self.database.get_max_lesson_in_days() + 1):
                     _, lesson = self.system.get_lesson_now(
@@ -155,7 +148,7 @@ class BotСollege:
                 _, lesson = self.system.get_lesson_now(_number_lesson=int(args[0]))
                 if lesson:
                     await message.answer(
-                        text=f"{self.days[self.system.get_day_isoweekday_now() - 1]}\n\t{args[0]} - {lesson}\nСсылка: {self.system.get_url(_number_lesson = int(args[0]))}"
+                        text=f"{self.days[self.system.get_day_isoweekday_now() - 1]}\n\t{args[0]} - {lesson}\nСсылка: {self.system.get_url(_number_lesson=int(args[0]))}"
                     )
 
                 else:
@@ -166,7 +159,7 @@ class BotСollege:
             else:
                 await message.reply(text="Такой пары нет.")
             return
-        
+
     async def cancel_lesson(self, message: Message, command: CommandObject):
         """
         Команда /cancel аргументы\n
@@ -188,12 +181,16 @@ class BotСollege:
         if args:
             for i in args:
                 if str(i).isdigit():
-                    if 0 < int(i) <= self.database.get_max_lesson_in_days(_debug = False):
+                    if 0 < int(i) <= self.database.get_max_lesson_in_days(_debug=False):
                         mass.append(int(i))
 
-        self.system.set_cancellation_on_lesson(mass = mass or None)
+        self.system.set_cancellation_on_lesson(mass=mass or None)
 
-        text = f"Пары отменены: <b>{', '.join([f"номер: {i[0]}, день: {self.days[i[1] - 1]}" for i in self.system.cancellation])}</b>." if self.system.cancellation else "Нет отмен."
+        text = (
+            f"Пары отменены: <b>{', '.join([f'номер: {i[0]}, день: {self.days[i[1] - 1]}' for i in self.system.cancellation])}</b>."
+            if self.system.cancellation
+            else "Нет отмен."
+        )
         await message.answer(text, parse_mode=ParseMode.HTML)
 
     async def pingme(self, message: Message):
@@ -207,9 +204,7 @@ class BotСollege:
         """
         print_debug("Bot", "Send [main]pingme[/main].")
 
-        result = self.database.add_user_in_pings(
-            username=message.from_user.username, user_id=message.from_user.id
-        )
+        result = self.database.add_user_in_pings(username=message.from_user.username, user_id=message.from_user.id)
         if result:
             await message.reply(
                 text="Вы были <b>добавлены</b> в список пингов.",
@@ -232,7 +227,7 @@ class BotСollege:
             message (Message): Сообщение.
         """
         await message.reply(
-            text=f"Вот всё кого будет пинговать: <b>{", ".join(self.database.get_all_usernames())}</b>.",
+            text=f"Вот всё кого будет пинговать: <b>{', '.join(self.database.get_all_usernames())}</b>.",
             parse_mode=ParseMode.HTML,
         )
 
@@ -257,7 +252,7 @@ class BotСollege:
                             )
                             await self.bot.send_message(
                                 chat_id=chat_id,
-                                text=f"Пинг: @{" @".join(self.database.get_all_usernames())}",
+                                text=f"Пинг: @{' @'.join(self.database.get_all_usernames())}",
                             )
 
                         except Exception as e:
@@ -271,15 +266,12 @@ class BotСollege:
         Args:
             target_times (list): Время отправки сообщения.
         """
-        utc_plus_2 = ZoneInfo(self.database.get_time_zone(_debug=False))
         while True:
-            now = datetime.now(utc_plus_2)
+            now = self.system.get_time_now()
             future_targets = []
             for time_str in target_times:
                 target_hour, target_minute = map(int, time_str.split(":"))
-                target = now.replace(
-                    hour=target_hour, minute=target_minute, second=0, microsecond=0
-                )
+                target = now.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
                 if now > target:
                     target += timedelta(days=1)
 
@@ -305,9 +297,7 @@ class BotСollege:
         for i in range(1, self.database.get_max_lesson_in_days() + 1):
             times_spam.append(self.database.get_send_spam(number_lesson=i))
 
-        print_debug(
-            "Bot", "Start scheduler. Times: [main]" + str(times_spam) + "[/main]."
-        )
+        print_debug("Bot", "Start scheduler. Times: [main]" + str(times_spam) + "[/main].")
         asyncio.create_task(self.scheduler(times_spam))
 
     async def start(self):
