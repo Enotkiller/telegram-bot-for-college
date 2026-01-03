@@ -1,0 +1,18 @@
+{
+    "chats_id" : ["список чатов в которые будут приходить сообщения"],
+    "chat_log_id" : "сделан на всякий случай",
+    "number_of_weeks_types": 2,
+    "data_week_type": {
+        "type": 1,
+        "year": 2025,
+        "month": 9,
+        "day": 1
+
+    },
+    "token" : "токен телеграм бота",
+    "redis_config": {
+        "host": "redis_service",
+        "port": 6379
+    }, 
+    "time_zone" : "Europe/Kiev"
+}

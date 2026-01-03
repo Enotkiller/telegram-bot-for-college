@@ -1,3 +1,4 @@
+name: TgBot
 services:
   redis:
     image: redis:7-alpine
@@ -13,8 +14,8 @@ services:
     depends_on:
       - redis
     volumes:
-      - ./code:/code
-      - ./data:/data
+      - ./code:/project/code
+      - ./data:/project/data
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
