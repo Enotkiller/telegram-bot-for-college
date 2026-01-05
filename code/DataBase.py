@@ -113,6 +113,9 @@ class DataBase:
                     elif isinstance(i, str):
                         lessons_data.append(i)
 
+                    elif isinstance(i, int):
+                        lessons_data.append(lessons[lessons.index(i) - 1 if lessons.index(i) != 0 else 0])
+
                     elif i is None:
                         lessons_data.append("None")
 

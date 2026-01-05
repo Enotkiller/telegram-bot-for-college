@@ -138,6 +138,10 @@ class System:
                 "System",
                 f"Get [main]lesson now[/main]. day: [main]{day}[/main], number lesson: [main]{number_lesson}[/main], type: [main]{type}[/main]",
             )
+            print_debug(
+                "System",
+                f"Get [main]lesson now[/main]. ids: [main]{repr(ids)}[/main], lessons: [main]{repr(lessons)}[/main]",
+            )
 
         if lessons and ids:
             lessons.reverse()
