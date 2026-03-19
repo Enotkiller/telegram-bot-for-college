@@ -58,9 +58,6 @@ class System:
             ids, lessons = self.database.get_lesson_for_date(day_week, int(number_lesson), _debug=False)
 
             if lessons and ids:
-                lessons.reverse()
-                ids.reverse()
-
                 return ids[type], lessons[type]
 
         return None, None
@@ -103,9 +100,6 @@ class System:
         type = self.get_week_type(_day=day, _mounth=mounth, _year=year, _debug=False)
 
         if lessons and ids:
-            lessons.reverse()
-            ids.reverse()
-
             return ids[type], lessons[type]
 
         return None, None
@@ -143,10 +137,8 @@ class System:
                 f"Get [main]lesson now[/main]. ids: [main]{repr(ids)}[/main], lessons: [main]{repr(lessons)}[/main]",
             )
 
-        if lessons and ids:
-            lessons.reverse()
-            ids.reverse()
 
+        if lessons and ids:
             return ids[type], lessons[type]
 
         return None, None
@@ -362,7 +354,7 @@ class System:
             else:
                 return False
 
-    def get_number_lesson_now(self) -> np.int8:
+    def get_number_lesson_now(self, _time: float = None) -> np.int8:
         """
 
         Получение номера пары сейчас.
@@ -371,7 +363,7 @@ class System:
             np.int8 : номер пары.
         """
 
-        time_now = self.get_time_float(_debug=False)
+        time_now = _time or self.get_time_float(_debug=False)
         times = self.database.get_times(_debug=False)
         for number_lesson in times:
             if (

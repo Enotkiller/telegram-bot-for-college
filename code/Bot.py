@@ -36,6 +36,7 @@ class BotСollege:
         self.dp.message.register(self.cancel_lesson, Command("cancel"))
         self.dp.message.register(self.pingme, Command("pingme"))
         self.dp.message.register(self.pingwho, Command("pingwho"))
+        self.dp.message.register(self.test, Command("test"))
 
     async def start_command(self, message: Message):
         """
@@ -257,6 +258,38 @@ class BotСollege:
 
                         except Exception as e:
                             print_debug("Bot", "Error: [red]" + str(e) + "[/red]")
+
+    async def test(self, message: Message, command: CommandObject):
+        arg = list(map(int, command.args.split(" "))) if command.args is not None else None
+        print_debug("Bot", f"Send [main]test[/main], parameters: [main]{arg}[/main].")
+        if len(arg) != 6:
+            await message.reply(text="Неверные аргументы.", parse_mode=ParseMode.HTML)
+            return
+        
+        repeat = arg[0]
+
+        year = arg[1]
+        month = arg[2]
+        day = arg[3]
+
+        hours = arg[4]
+        minutes = arg[5]
+        time = hours + minutes / 100
+
+        start = datetime.now()
+
+        for _ in range(repeat):
+            self.system.get_lesson_for_date(day=day, mounth=month, year=year, number_lesson=self.system.get_number_lesson_now(_time = time))
+
+        end = datetime.now()
+        total = end - start
+        total = total.total_seconds()
+        avg = total / repeat
+        lesson = self.system.get_lesson_for_date(day=day, mounth=month, year=year, number_lesson=self.system.get_number_lesson_now(_time = time))
+        await message.reply(
+            text=f"Сам урок <b>{lesson[1]}</b>\nВремя выполнения: <b>{total:.4f} s</b>\nСреднее время: <b>{avg:.4f} s = {avg * 1000:.4f} ms</b>.",
+            parse_mode=ParseMode.HTML,
+        )
 
     async def scheduler(self, target_times: list):
         """
